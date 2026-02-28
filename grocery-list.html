@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shared Grocery List</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 400;
+            color: #3a3a3a;
+            background: linear-gradient(135deg, #f5f1e8 0%, #faf8f4 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 500px;
+            overflow: hidden;
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(40px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        header {
+            background: linear-gradient(135deg, #6d8659 0%, #7f9668 100%);
+            color: #ffffff;
+            padding: 35px 20px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(109, 134, 89, 0.15);
+        }
+
+        h1 {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            letter-spacing: -0.5px;
+        }
+
+        .status {
+            font-size: 13px;
+            font-weight: 500;
+            opacity: 0.95;
+            letter-spacing: 0.3px;
+        }
+
+        .user-selector {
+            padding: 15px 20px;
+            background: #fefdfb;
+            border-bottom: 1px solid #f0e8df;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .user-btn {
+            padding: 8px 16px;
+            border: 2px solid #e5ddd0;
+            border-radius: 8px;
+            background: white;
+            color: #3a3a3a;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 500;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .user-btn.active {
+            background: #d4956f;
+            color: white;
+            border-color: #d4956f;
+        }
+
+        .user-btn:hover {
+            border-color: #d4956f;
+        }
+
+        .input-section {
+            padding: 20px;
+            border-bottom: 1px solid #f0e8df;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .quantity-input {
+            width: 50px;
+            padding: 13px 8px;
+            border: 2px solid #e5ddd0;
+            border-radius: 12px;
+            font-size: 15px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 400;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .quantity-input:focus {
+            outline: none;
+            border-color: #6d8659;
+            box-shadow: 0 0 0 3px rgba(109, 134, 89, 0.1);
+        }
+
+        #itemInput {
+            flex: 1;
+            padding: 13px 16px;
+            border: 2px solid #e5ddd0;
+            border-radius: 12px;
+            font-size: 15px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 400;
+            transition: all 0.3s ease;
+            background: #ffffff;
+        }
+
+        #itemInput:focus {
+            outline: none;
+            border-color: #6d8659;
+            box-shadow: 0 0 0 3px rgba(109, 134, 89, 0.1);
+        }
+
+        #itemInput::placeholder {
+            color: #b8b0a3;
+        }
+
+        #itemInput {
+            accent-color: #6d8659;
+        }
+
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            font-family: 'Poppins', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        #addBtn {
+            background: linear-gradient(135deg, #6d8659 0%, #7f9668 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(109, 134, 89, 0.2);
+        }
+
+        #addBtn:hover {
+            background: linear-gradient(135deg, #5f7650 0%, #71885c 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(109, 134, 89, 0.3);
+        }
+
+        #addBtn:active {
+            transform: translateY(0);
+        }
+
+        .list-section {
+            padding: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: #b8b0a3;
+            padding: 40px 20px;
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        .grocery-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 15px 16px;
+            background: #fefdfb;
+            border-radius: 12px;
+            margin-bottom: 10px;
+            border: 1px solid #f0e8df;
+            animation: itemAppear 0.4s ease-out;
+            transition: all 0.3s ease;
+        }
+
+        @keyframes itemAppear {
+            from {
+                transform: translateX(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .grocery-item.checked {
+            background: #ebe7dd;
+            animation: checkBounce 0.5s ease-out;
+        }
+
+        @keyframes checkBounce {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.02);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .grocery-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: #6d8659;
+            flex-shrink: 0;
+        }
+
+        .item-text {
+            flex: 1;
+            word-break: break-word;
+            transition: all 0.3s;
+            font-size: 15px;
+            font-weight: 500;
+            color: #3a3a3a;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .grocery-item.checked .item-text {
+            text-decoration: line-through;
+            color: #999;
+            font-weight: 400;
+        }
+
+        .delete-btn {
+            background: #e8b4a8;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s;
+        }
+
+        .delete-btn:hover {
+            background: #dba299;
+            transform: scale(1.05);
+        }
+
+        .actions {
+            padding: 20px;
+            border-top: 1px solid #f0e8df;
+            display: flex;
+            gap: 10px;
+        }
+
+        #clearBtn {
+            flex: 1;
+            background: linear-gradient(135deg, #d4956f 0%, #dea67e 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(212, 149, 111, 0.2);
+        }
+
+        #clearBtn:hover {
+            background: linear-gradient(135deg, #c5805e 0%, #cf966d 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(212, 149, 111, 0.3);
+        }
+
+        #clearBtn:disabled {
+            background: #ddd;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                border-radius: 15px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            .list-section {
+                max-height: 300px;
+            }
+
+            button {
+                font-size: 14px;
+                padding: 10px 16px;
+            }
+
+            #itemInput {
+                padding: 10px 14px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🛒 Grocery List</h1>
+            <div class="status" id="status">Loading...</div>
+        </header>
+
+        <div class="user-selector">
+            <button class="user-btn active" id="userWilliam" onclick="setUser('William')">🐉 William</button>
+            <button class="user-btn" id="userEmily" onclick="setUser('Emily')">😭 Emily</button>
+        </div>
+
+        <div class="input-section">
+            <input
+                type="text"
+                id="itemInput"
+                placeholder="Add an item..."
+                autocomplete="off"
+            />
+            <input
+                type="number"
+                id="quantityInput"
+                class="quantity-input"
+                min="1"
+                value="1"
+                placeholder="Qty"
+            />
+            <button id="addBtn">Add</button>
+        </div>
+
+        <div class="list-section" id="listSection">
+            <div class="empty-state">Your list is empty</div>
+        </div>
+
+        <div class="actions">
+            <button id="clearBtn" disabled>Clear All</button>
+        </div>
+    </div>
+
+    <!-- Firebase SDKs (Compat version for regular scripts) -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+
+    <script>
+        // Emoji mapping for foods
+        const foodEmojis = {
+            bread: '🍞',
+            milk: '🥛',
+            cheese: '🧀',
+            eggs: '🥚',
+            butter: '🧈',
+            yogurt: '🥣',
+            apple: '🍎',
+            banana: '🍌',
+            orange: '🍊',
+            lemon: '🍋',
+            strawberry: '🍓',
+            blueberry: '🫐',
+            watermelon: '🍉',
+            grape: '🍇',
+            pineapple: '🍍',
+            mango: '🥭',
+            carrot: '🥕',
+            broccoli: '🥦',
+            spinach: '🥬',
+            lettuce: '🥬',
+            tomato: '🍅',
+            cucumber: '🥒',
+            pepper: '🫑',
+            onion: '🧅',
+            garlic: '🧄',
+            potato: '🥔',
+            'sweet potato': '🍠',
+            corn: '🌽',
+            peas: '🫛',
+            beans: '🫘',
+            chicken: '🍗',
+            beef: '🥩',
+            fish: '🐟',
+            shrimp: '🦐',
+            salmon: '🐟',
+            pork: '🐷',
+            turkey: '🦃',
+            rice: '🍚',
+            pasta: '🍝',
+            pizza: '🍕',
+            burger: '🍔',
+            'hot dog': '🌭',
+            sandwich: '🥪',
+            taco: '🌮',
+            sushi: '🍣',
+            ramen: '🍜',
+            soup: '🍲',
+            salad: '🥗',
+            fries: '🍟',
+            chips: '🥔',
+            cookies: '🍪',
+            cake: '🎂',
+            donut: '🍩',
+            chocolate: '🍫',
+            candy: '🍬',
+            honey: '🍯',
+            coffee: '☕',
+            tea: '🍵',
+            juice: '🧃',
+            soda: '🥤',
+            water: '💧',
+            beer: '🍺',
+            wine: '🍷',
+            olive: '🫒',
+            avocado: '🥑',
+            nuts: '🥜',
+            coconut: '🥥',
+            lime: '🍋',
+            pear: '🍐',
+            peach: '🍑',
+            kiwi: '🥝'
+        };
+
+        function getEmoji(text) {
+            const lowercased = text.toLowerCase();
+            // Check for exact matches first
+            if (foodEmojis[lowercased]) return foodEmojis[lowercased];
+            // Check if text contains any food item
+            for (const [food, emoji] of Object.entries(foodEmojis)) {
+                if (lowercased.includes(food)) return emoji;
+            }
+            return '🛒'; // Default grocery emoji
+        }
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAvbqPaf5s2CV1p8p0Q05KNn3zZJjwparw",
+            authDomain: "anabolic-grocery.firebaseapp.com",
+            databaseURL: "https://anabolic-grocery-default-rtdb.firebaseio.com",
+            projectId: "anabolic-grocery",
+            storageBucket: "anabolic-grocery.firebasestorage.app",
+            messagingSenderId: "476389491865",
+            appId: "1:476389491865:web:7412764caebad35595e408"
+        };
+
+        // User management
+        let currentUser = 'William';
+
+        function setUser(name) {
+            currentUser = name;
+            document.getElementById('userWilliam').classList.remove('active');
+            document.getElementById('userEmily').classList.remove('active');
+            document.getElementById('user' + name).classList.add('active');
+        }
+
+        // Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+        const listRef = db.ref('groceries');
+
+        // DOM Elements
+        const itemInput = document.getElementById('itemInput');
+        const addBtn = document.getElementById('addBtn');
+        const listSection = document.getElementById('listSection');
+        const clearBtn = document.getElementById('clearBtn');
+        const status = document.getElementById('status');
+
+        let items = {};
+
+        // Set up real-time listener
+        listRef.on('value', (snapshot) => {
+            items = snapshot.val() || {};
+            renderList();
+            status.textContent = '✅ Synced';
+        }, (error) => {
+            status.textContent = '❌ Error: ' + error.message;
+            console.error('Database error:', error);
+        });
+
+        // Add item
+        function addItem() {
+            const text = itemInput.value.trim();
+            const quantity = parseInt(document.getElementById('quantityInput').value) || 1;
+            if (!text) return;
+
+            listRef.push({
+                text: text,
+                quantity: quantity,
+                addedBy: currentUser,
+                completed: false,
+                timestamp: Date.now()
+            }).catch((error) => {
+                console.error('Error adding item:', error);
+                status.textContent = '❌ Failed to add item';
+            });
+
+            itemInput.value = '';
+            document.getElementById('quantityInput').value = '1';
+            itemInput.focus();
+        }
+
+        // Toggle item completion
+        function toggleItem(id) {
+            const isCompleted = items[id].completed;
+            db.ref(`groceries/${id}`).update({
+                completed: !isCompleted
+            }).catch((error) => {
+                console.error('Error toggling item:', error);
+            });
+        }
+
+        // Delete item
+        function deleteItem(id) {
+            db.ref(`groceries/${id}`).remove().catch((error) => {
+                console.error('Error deleting item:', error);
+            });
+        }
+
+        // Clear all items
+        function clearAll() {
+            if (Object.keys(items).length === 0) return;
+            if (!confirm('Are you sure? This will delete all items.')) return;
+
+            Object.keys(items).forEach(id => {
+                db.ref(`groceries/${id}`).remove();
+            });
+        }
+
+        // Render list
+        function renderList() {
+            if (Object.keys(items).length === 0) {
+                listSection.innerHTML = '<div class="empty-state">Your list is empty</div>';
+                clearBtn.disabled = true;
+                return;
+            }
+
+            listSection.innerHTML = '';
+            clearBtn.disabled = false;
+
+            // Sort by completion status (unchecked first) and timestamp
+            const sortedItems = Object.entries(items)
+                .sort(([, a], [, b]) => {
+                    if (a.completed === b.completed) {
+                        return b.timestamp - a.timestamp;
+                    }
+                    return a.completed ? 1 : -1;
+                });
+
+            sortedItems.forEach(([id, item]) => {
+                const div = document.createElement('div');
+                div.className = `grocery-item ${item.completed ? 'checked' : ''}`;
+
+                const quantity = item.quantity || 1;
+                const addedBy = item.addedBy || 'Unknown';
+
+                div.innerHTML = `
+                    <input
+                        type="checkbox"
+                        ${item.completed ? 'checked' : ''}
+                        onchange="toggleItem('${id}')"
+                    />
+                    <div style="flex: 1; display: flex; gap: 8px;">
+                        <span style="font-size: 20px; flex-shrink: 0;">${getEmoji(item.text)}</span>
+                        <span style="display: flex; flex-direction: column; gap: 3px; flex: 1;">
+                            <span>${escapeHtml(item.text)} <span style="color: #999; font-weight: 400;">x${quantity}</span></span>
+                            <span style="font-size: 12px; color: #b8b0a3; font-weight: 400;">Added by ${addedBy}</span>
+                        </span>
+                    </div>
+                    <button class="delete-btn" onclick="deleteItem('${id}')">Delete</button>
+                `;
+
+                listSection.appendChild(div);
+            });
+        }
+
+        // Utility function to escape HTML
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Event listeners
+        addBtn.addEventListener('click', addItem);
+        itemInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') addItem();
+        });
+        document.getElementById('quantityInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') addItem();
+        });
+        clearBtn.addEventListener('click', clearAll);
+
+        // Make functions global for onclick handlers
+        window.toggleItem = toggleItem;
+        window.deleteItem = deleteItem;
+        window.setUser = setUser;
+    </script>
+</body>
+</html>
